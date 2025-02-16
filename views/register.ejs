@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>
+            Real-Time Quiz
+        </title>
+    </head>
+    <body>
+        <form action="/register" method="POST" onsubmit="return validateForm()">
+            <h1>Real Time Quiz</h1>
+            <h3>Register New User:</h3>
+            <%
+                if('undefined' != typeof msg){
+            %>
+                    <p style="color: red;" id="errorMsg"><%=msg%></p>
+                    <script>
+                        setTimeout(() => {
+                            document.getElementById('errorMsg').innerHTML = '';
+                            document.getElementById('errorMsg').style.display = 'none';
+                        }, 5000);
+                    </script>
+            <%
+                }
+            %>
+            <table>
+                <tr>
+                    <td>Username: </td>
+                    <td><input type="text" name="username" id="username" required></td>
+                </tr>
+                <tr>
+                    <td>Password: </td>
+                    <td><input type="password" name="password" id="password" required></td>
+                </tr>
+                <tr>
+                    <td>Re-enter Password: </td>
+                    <td><input type="password" name="reenterpassword" id="reenterpassword" required></td>
+                </tr>
+            </table>
+            <p><button type="submit" value="submit">Submit</button></p>
+        </form>
+    </body>
+</html>
+
+<script>
+    function validateForm(){
+        let uName = document.getElementById('username').value;
+        let pass = document.getElementById('password').value;
+        let reEnterPass = document.getElementById('reenterpassword').value;
+        if(uName.includes(' ')){
+            alert('Username cannot contain spaces');
+            return false;
+        }
+        if(pass.includes(' ')){
+            alert('Password cannot have spaces');
+            return false;
+        }
+        if(pass != reEnterPass){
+            alert('Both passwords should be same');
+            return false;
+        }
+        return true;
+    }
+</script>

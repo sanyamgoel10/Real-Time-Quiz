@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title>
+            Real-Time Quiz
+        </title>
+    </head>
+    <body>
+        <form action="/login" method="POST" onsubmit="return validateForm()">
+            <h1>Real Time Quiz</h1>
+            <p>
+                A real-time quiz game where two players compete against each other.
+                <br>
+                Each player is presented with the same 4 questions in sequence, and they answer these questions independently.
+                <br>
+                The player who scores the highest out of the 4 questions wins the game.
+            </p>
+            <h3>Enter credentials to login:</h3>
+            <%
+                if('undefined' != typeof msg){
+            %>
+                    <p style="color: red;" id="errorMsg"><%=msg%></p>
+                    <script>
+                        setTimeout(() => {
+                            document.getElementById('errorMsg').innerHTML = '';
+                            document.getElementById('errorMsg').style.display = 'none';
+                        }, 5000);
+                    </script>
+            <%
+                }
+            %>
+            <table>
+                <tr>
+                    <td>Username: </td>
+                    <td><input type="text" name="username" id="username" required></td>
+                </tr>
+                <tr>
+                    <td>Password: </td>
+                    <td><input type="password" name="password" id="password" required></td>
+                </tr>
+            </table>
+            <p><button type="submit" value="submit">Submit</button></p>
+            <p>New User? <a href="/register">Click here</a> to login</p>
+        </form>
+    </body>
+</html>
+
+<script>
+    function validateForm(){
+        let uName = document.getElementById('username').value;
+        let pass = document.getElementById('password').value;
+        if(uName.includes(' ')){
+            alert('Username cannot contain spaces');
+            return false;
+        }
+        if(pass.includes(' ')){
+            alert('Password cannot have spaces');
+            return false;
+        }
+        return true;
+    }
+</script>

@@ -1,0 +1,19 @@
+{
+  "name": "real-time-quiz",
+  "version": "1.0.0",
+  "description": "A real-time quiz game where two players compete against each other. Each player is presented with the same 4 questions in sequence, and they answer these questions independently. The player who scores the highest out of the 4 questions wins the game.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "mongoose": "^8.10.1",
+    "nodemon": "^3.1.9"
+  }
+}
