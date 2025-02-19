@@ -11,13 +11,13 @@ app.set('view engine','ejs');
 
 // Routes
 const userRoutes = require('./routes/userRoutes.js');
+const gameRoutes = require('./routes/gameRoutes.js');
 
 // User Routes
 app.use('/', userRoutes);
+
 // Game Routes
-app.use('/game', (req, res) => {
-    return res.render('landingpage');
-});
+app.use('/game', gameRoutes);
 
 // 404 Error Handler
 app.use((req, res) => {

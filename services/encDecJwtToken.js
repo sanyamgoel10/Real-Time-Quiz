@@ -3,16 +3,31 @@ const jwt = require('jsonwebtoken');
 
 class TokenService {
     async createNewToken(data) {
-        if('undefined' == typeof config.JWT_SECRET_KEY){
-            return false;   
+        try{
+            if('undefined' == typeof config.JWT_SECRET_KEY){
+                return false;   
+            }
+            let jwtSecretKey = config.JWT_SECRET_KEY;
+            const token = jwt.sign(data, jwtSecretKey);
+            return token;
+        }catch(error){
+            console.log(`Error: ${error}`);
+            return false;
         }
-        let jwtSecretKey = config.JWT_SECRET_KEY;
-        const token = jwt.sign(data, jwtSecretKey);
-        return token;
     }
 
     async verifyJwtToken(token) {
-        
+        try{
+            let jwtSecretKey = config.JWT_SECRET_KEY;
+            let verified = jwt.verify(token, jwtSecretKey);
+            if('undefined' != typeof verified && verified != null && 'object' == typeof verified){
+                return verified;
+            }
+            return false;
+        }catch(error){
+            console.log(`Error: ${error}`);
+            return false
+        }
     }
 }
 
