@@ -29,12 +29,12 @@ const startServer = async () => {
                         let currAction = reqMsg.action;
                         let userName = reqMsg.username;
 
-                        if(currAction == 'searchNewGame'){
+                        if(currAction == 'initialize'){
 
                         }
 
-                        // Broadcast message to all users connected to websocket server
-                        await broadcastMessageOnWs(WebSocket, wss, ws, message);
+                        // Broadcast message
+                        // await broadcastMessageOnWs(WebSocket, wss, ws, message);
                     }
                 }
             });

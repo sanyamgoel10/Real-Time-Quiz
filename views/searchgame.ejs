@@ -1,31 +1,61 @@
-Searching for User..........
+<html>
+    <head>
+        <title>
+            Real-Time Quiz
+        </title>
+    </head>
+    <body>
+        <h1>Real-Time Quiz</h1>
+        <p id="searching">
+            Please wait, while we are searching for a quiz game for you.....
+        </p>
+        <p>
+            <button onclick="logout()">Logout</button>
+        </p>
+    </body>
+</html>
 
-
-
-<script type="text/javascript">    
+<script type="text/javascript">
+    // Initializing the websocket connection
     const ws = new WebSocket(`ws://${window.location.host}`);
     ws.onopen = () => {
-        console.log('Connected to the server');
-        ws.send(JSON.stringify({
-            action: "searchNewGame",
-            username: "<%=userName%>"
-        }));
+        try{
+            console.log('Connected to the server');
+
+            sendMessage({
+                action: "initialize"
+            });
+
+            // Receive WS Message
+            ws.onmessage = (event) => {
+                console.log("Event: ", event);
+            };
+
+            // WS Error
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                closeWebsocketConnection();
+            };
+
+            // WS Close Connection
+            function closeWebsocketConnection(){
+                ws.onclose = () => {
+                    console.log('Disconnected from the server');
+                };
+            }
+
+            // Send WS Message
+            function sendMessage(message){
+                message['username'] = "<%=userName%>";
+                ws.send(JSON.stringify(message));
+            }
+        }catch(error){
+            console.log("Error in websocket: ", error);
+            window.location.href = "/logout";
+        }
     };
-    ws.onmessage = (event) => {
-        // const message = document.createElement('div');
-        // message.textContent = event.data;
-        // messages.appendChild(message);
-        console.log("Event: ", event);
-    };
-    ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-    };
-    ws.onclose = () => {
-        console.log('Disconnected from the server');
-    };
-    // sendButton.onclick = () => {
-    //     const message = messageInput.value;
-    //     ws.send(message);
-    //     messageInput.value = '';
-    // };
+
+    function logout() {
+        window.location.href = "/logout";
+    }
 </script>
