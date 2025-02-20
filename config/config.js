@@ -1,7 +1,5 @@
 module.exports = {
     port: 3000,
-
-    wsPort: 4000,
     
     dbHost: "localhost",
     dbPort: 27017,
