@@ -1,4 +1,4 @@
-const User = require('../services/models/user.js');
+const User = require('../services/models/users.js');
 const encryptPass = require('../services/encDecPass.js');
 const encDecToken = require('../services/encDecJwtToken.js');
 
