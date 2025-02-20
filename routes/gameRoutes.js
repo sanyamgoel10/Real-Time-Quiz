@@ -8,6 +8,6 @@ const { landingpage } = require('../controllers/gameController.js');
 const { verifyJwt } = require('../middleware/validateUserReq.js');
 
 // Routes
-router.get('/:token', verifyJwt, landingpage);
+router.get('/', verifyJwt, landingpage);
 
 module.exports = router;

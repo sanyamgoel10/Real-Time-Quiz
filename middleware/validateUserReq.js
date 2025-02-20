@@ -3,12 +3,15 @@ const { verifyJwtToken } = require('../services/encDecJwtToken.js');
 class ValidateToken{
     async verifyJwt(req, res, next){
         try {
-            if('undefined' == typeof req.params.token || req.params.token == null || 'string' != typeof req.params.token || (req.params.token).trim() == ''){
-                let errResp = `token not in request`;
+            let pageCookies = req.cookies;
+
+            if('undefined' == typeof pageCookies.userToken || pageCookies.userToken == null || 'string' != typeof pageCookies.userToken || (pageCookies.userToken).trim() == ''){
+                let errResp = `token not found in req`;
                 console.log(`Error: ${errResp}`);
                 return res.render('error');
             }
-            let verifiedToken = await verifyJwtToken(req.params.token);
+
+            let verifiedToken = await verifyJwtToken(pageCookies.userToken);
             if(!verifiedToken || 'undefined' == typeof verifiedToken.username){
                 let errResp = `Invalid token in req`;
                 console.log(`Error: ${errResp}`);
