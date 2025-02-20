@@ -20,9 +20,23 @@ const startServer = async () => {
         wss.on('connection', async (ws) => {
             console.log('A new client has connected to websocket.');
             ws.on('message', async (message) => {
-                console.log(`Received: ${message} from client`);
-                // Broadcast message to all users connected to websocket server
-                await broadcastMessageOnWs(wss, message);
+                console.log(`Received message from client`);
+
+                if('undefined' != typeof message){
+                    let reqMsg = JSON.parse(message);
+                    console.log("Message from client: ", reqMsg);
+                    if('undefined' != typeof reqMsg.action && 'undefined' != typeof reqMsg.username){
+                        let currAction = reqMsg.action;
+                        let userName = reqMsg.username;
+
+                        if(currAction == 'searchNewGame'){
+
+                        }
+
+                        // Broadcast message to all users connected to websocket server
+                        await broadcastMessageOnWs(WebSocket, wss, ws, message);
+                    }
+                }
             });
             // Websocket Connection Closing
             ws.on('close', () => {
@@ -40,13 +54,13 @@ const startServer = async () => {
     }
 };
 
-async function broadcastMessageOnWs(wss, message){
+async function broadcastMessageOnWs(WebSocket, wss, ws, message){
     let allClients = wss.clients;
     allClients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
     });
-  }
+}
 
 startServer();

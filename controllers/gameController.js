@@ -5,8 +5,7 @@ class GameController{
 
     async searchGame(req, res){
         let userName = req.UserNameFromToken;
-        console.log("userName: ", userName);
-        return res.render('searchgame');
+        return res.render('searchgame', {userName});
     }
 }
 module.exports = new GameController();
