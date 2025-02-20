@@ -8,9 +8,7 @@
         <h1>Real-Time Quiz</h1>
         <h3>You have successfully logged in to the game.</h3>
         <p>
-            <form action="/game/start" method="GET">
-                <button type="submit" value="submit">Start Game</button>
-            </form>
+            <button onclick="searchGame()">Start Game</button>
             <button onclick="logout()">Logout</button>
         </p>
     </body>
@@ -19,5 +17,8 @@
 <script>
     function logout() {
         window.location.href = "/logout";
+    }
+    function searchGame(){
+        window.location.href = '/game/start';
     }
 </script>
