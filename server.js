@@ -1,4 +1,4 @@
-const { connectDB } = require("./services/db.js");
+const { connectDB, initializeQuestions } = require("./services/db.js");
 
 const config = require("./config/config.js");
 
@@ -15,6 +15,9 @@ const wss = new WebSocket.Server({ server });
 const startServer = async () => {
     try {
         await connectDB();
+
+        // Only uncomment this for adding questions to the database next time
+        await initializeQuestions();
         
         // Websocket connection start
         wss.on('connection', async (ws) => {
