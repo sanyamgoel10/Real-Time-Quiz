@@ -109,6 +109,11 @@ const initializeQuestions = async () => {
             options: ["Atom", "Molecule", "Cell", "Organ"],
             correctOptionIndex: 2
         },
+        {
+            question: "What is the capital of India?",
+            options: ["Mumbai", "Kolkata", "Bengaluru", "Delhi"],
+            correctOptionIndex: 3
+        },
     ];
     for(let i in questions){
         let currQuestion = questions[i];
