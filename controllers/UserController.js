@@ -1,6 +1,6 @@
-const Users = require('../services/models/users.js');
-const encryptPass = require('../services/PasswordService.js');
-const encDecToken = require('../services/TokenService.js');
+const DatabaseService = require('../services/DatabaseService.js');
+const PasswordService = require('../services/PasswordService.js');
+const TokenService = require('../services/TokenService.js');
 
 class UserController{
     async homepage(req, res){
@@ -21,9 +21,7 @@ class UserController{
         let uName = req.body.username;
         let pass = req.body.password;
 
-        let findExistingUname = await Users.findOne({
-            username: uName
-        });
+        let findExistingUname = await DatabaseService.findUserByUsername(uName);
 
         if('undefined' == typeof findExistingUname || findExistingUname == null){
             let errResp = `Invalid Username, user not found`;
@@ -31,8 +29,8 @@ class UserController{
             return res.render('login', {msg: `${errResp}`});
         }
 
-        if(await encryptPass.comparePassword(pass, findExistingUname.password)){
-            let userToken = await encDecToken.createJwtToken({
+        if(await PasswordService.comparePassword(pass, findExistingUname.password)){
+            let userToken = await TokenService.createJwtToken({
                 username: uName,
                 time: Date()
             });
@@ -76,9 +74,7 @@ class UserController{
                 return res.render('register', {msg: `${errResp}`});
             }
 
-            let findExistingUname = await Users.findOne({
-                username: uName
-            });
+            let findExistingUname = await DatabaseService.findUserByUsername(uName);
 
             if(findExistingUname){
                 let errResp = `Username already found`;
@@ -86,7 +82,7 @@ class UserController{
                 return res.render('register', {msg: `${errResp}`});
             }
 
-            let userToken = await encDecToken.createJwtToken({
+            let userToken = await TokenService.createJwtToken({
                 username: uName,
                 time: Date()
             });
@@ -96,11 +92,10 @@ class UserController{
                 return res.render('error');
             }
 
-            const newUser = new Users({
+            await DatabaseService.registerNewUser({
                 username: uName,
-                password: await encryptPass.hashPassword(pass)
+                password: await PasswordService.hashPassword(pass)
             });
-            await newUser.save();
 
             return res.cookie('token', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 60 * 60 * 1000 }).redirect(`/game`);
         }catch(error){

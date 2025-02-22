@@ -1,4 +1,5 @@
-const { verifyJwtToken } = require('../services/TokenService.js');
+const TokenService = require('../services/TokenService.js');
+const DatabaseService = require('../services/DatabaseService.js');
 
 class AuthMiddleware{
     async validateUserLogin(req, res, next){
@@ -8,9 +9,14 @@ class AuthMiddleware{
             console.log(`Error: ${errResp}`);
             return res.render('requiredlogin');
         }
-        let verifiedToken = await verifyJwtToken(pageCookies.token);
+        let verifiedToken = await TokenService.verifyJwtToken(pageCookies.token);
         if(!verifiedToken || 'undefined' == typeof verifiedToken.username){
             let errResp = `Invalid or Expired Token`;
+            console.log(`Error: ${errResp}`);
+            return res.render('requiredlogin');
+        }
+        if(!(await DatabaseService.validateUserName(verifiedToken.username))){
+            let errResp = `Invalid username in token`;
             console.log(`Error: ${errResp}`);
             return res.render('requiredlogin');
         }
@@ -20,8 +26,8 @@ class AuthMiddleware{
 
     async checkAlreadyLoggedIn(req, res, next){
         if('undefined' != typeof req.cookies.token && 'string' == typeof req.cookies.token && (req.cookies.token).trim() != ''){
-            let verifiedToken = await verifyJwtToken(req.cookies.token);
-            if(verifiedToken && 'undefined' != typeof verifiedToken.username){
+            let verifiedToken = await TokenService.verifyJwtToken(req.cookies.token);
+            if(verifiedToken && verifiedToken.username && (await DatabaseService.validateUserName(verifiedToken.username))){
                 req.UserNameFromToken = verifiedToken.username;
                 return res.redirect('/game');
             }
