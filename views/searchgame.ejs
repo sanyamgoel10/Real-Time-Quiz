@@ -16,46 +16,4 @@
 </html>
 
 <script type="text/javascript">
-    // Initializing the websocket connection
-    const ws = new WebSocket(`ws://${window.location.host}`);
-    ws.onopen = () => {
-        try{
-            console.log('Connected to the server');
-
-            sendMessage({
-                action: "initialize"
-            });
-
-            // Receive WS Message
-            ws.onmessage = (event) => {
-                console.log("Event: ", event);
-            };
-
-            // WS Error
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-                closeWebsocketConnection();
-            };
-
-            // WS Close Connection
-            function closeWebsocketConnection(){
-                ws.onclose = () => {
-                    console.log('Disconnected from the server');
-                };
-            }
-
-            // Send WS Message
-            function sendMessage(message){
-                message['username'] = "<%=userName%>";
-                ws.send(JSON.stringify(message));
-            }
-        }catch(error){
-            console.log("Error in websocket: ", error);
-            window.location.href = "/logout";
-        }
-    };
-
-    function logout() {
-        window.location.href = "/logout";
-    }
 </script>
