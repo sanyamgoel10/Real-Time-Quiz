@@ -112,7 +112,7 @@ const initializeQuestions = async () => {
     ];
     for(let i in questions){
         let currQuestion = questions[i];
-        currQuestion['id'] = i+1;
+        currQuestion['id'] = Number(i) + 1;
         if(!(await QuizQuestions.findOne({question: currQuestion['question']}))){
             await QuizQuestions.insertOne(currQuestion);
         }
