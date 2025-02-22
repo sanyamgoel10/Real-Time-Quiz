@@ -4,13 +4,16 @@ const router = express.Router();
 // Controllers
 const { homepage, loginPage, userLogin, registerPage, registerNewUser, userLogout } = require('../controllers/UserController.js');
 
-// Routes
-router.get('/', homepage);
+// Middleware
+const { checkAlreadyLoggedIn } = require('../middleware/authMiddleware.js');
 
-router.get('/login', loginPage);
+// Routes
+router.get('/', checkAlreadyLoggedIn, homepage);
+
+router.get('/login', checkAlreadyLoggedIn, loginPage);
 router.post('/login', userLogin);
 
-router.get('/register', registerPage);
+router.get('/register', checkAlreadyLoggedIn, registerPage);
 router.post('/register', registerNewUser);
 
 router.get('/logout', userLogout);

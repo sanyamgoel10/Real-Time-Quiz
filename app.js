@@ -15,11 +15,11 @@ app.use(cookieParser());
 const userRoutes = require('./routes/UserRoutes.js');
 const gameRoutes = require('./routes/GameRoutes.js');
 
-// Services
-const { validateUserLogin, checkAlreadyLoggedIn } = require('./middleware/authMiddleware.js');
+// Middleware
+const { validateUserLogin } = require('./middleware/authMiddleware.js');
 
 // User Routes
-app.use('/', checkAlreadyLoggedIn, userRoutes);
+app.use('/', userRoutes);
 
 // Game Routes
 app.use('/game', validateUserLogin, gameRoutes);
