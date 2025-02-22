@@ -1,4 +1,4 @@
-const User = require('../services/models/users.js');
+const Users = require('../services/models/users.js');
 const encryptPass = require('../services/encDecPass.js');
 const encDecToken = require('../services/encDecJwtToken.js');
 
@@ -21,7 +21,7 @@ class LoginController{
         let uName = req.body.username;
         let pass = req.body.password;
 
-        let findExistingUname = await User.findOne({
+        let findExistingUname = await Users.findOne({
             username: uName
         });
 
@@ -73,7 +73,7 @@ class LoginController{
                 return res.render('register', {msg: `${errResp}`});
             }
 
-            let findExistingUname = await User.findOne({
+            let findExistingUname = await Users.findOne({
                 username: uName
             });
 
@@ -93,7 +93,7 @@ class LoginController{
                 return res.render('error');
             }
 
-            const newUser = new User({
+            const newUser = new Users({
                 username: uName,
                 password: await encryptPass.hashPassword(pass),
                 token: userToken,
