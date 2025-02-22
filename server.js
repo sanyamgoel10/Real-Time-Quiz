@@ -14,6 +14,7 @@ const wss = new WebSocket.Server({ server });
 
 const startServer = async () => {
     try {
+        // Connect to database
         await connectDB();
 
         // Initialize questions in database
