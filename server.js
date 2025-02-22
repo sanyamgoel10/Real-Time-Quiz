@@ -16,7 +16,7 @@ const startServer = async () => {
     try {
         await connectDB();
 
-        // Only uncomment this for adding questions to the database next time
+        // Initialize questions in database
         await initializeQuestions();
         
         // Websocket connection start
