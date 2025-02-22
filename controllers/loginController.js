@@ -32,7 +32,10 @@ class LoginController{
         }
 
         if(await encryptPass.comparePassword(pass, findExistingUname.password)){
-            let userToken = findExistingUname.token;
+            let userToken = await encDecToken.createNewToken({
+                username: uName,
+                time: Date()
+            });
             return res.cookie('userToken', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 15 * 60 * 1000 }).redirect(`/game`);
         }else{
             let errResp = `Invalid Password`;
