@@ -7,6 +7,6 @@ module.exports = {
 
     EncryptSaltRounds: 10,
 
-    JWT_SECRET_KEY: "gfg_jwt_secret_key",
-    TOKEN_HEADER_KEY: "gfg_token_header_key",
+    JWT_SECRET_KEY: "jwt_secret_key_sg",
+    TOKEN_HEADER_KEY: "jwt_header_key_sg",
 }
