@@ -33,9 +33,89 @@ const initializeQuestions = async () => {
             question: "Which planet is known as the Red Planet?",
             options: ["Earth", "Mars", "Jupiter", "Saturn"],
             correctOptionIndex: 1
-        }
+        },
+        {
+            question: "Which gas is most abundant in Earth's atmosphere?",
+            options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Argon"],
+            correctOptionIndex: 1
+        },
+        {
+            question: "What is the capital of Japan?",
+            options: ["Seoul", "Tokyo", "Beijing", "Bangkok"],
+            correctOptionIndex: 1
+        },
+        {
+            question: "Which element has the chemical symbol 'O'?",
+            options: ["Gold", "Oxygen", "Osmium", "Oxide"],
+            correctOptionIndex: 1
+        },
+        {
+            question: "Who wrote 'Romeo and Juliet'?",
+            options: ["William Shakespeare", "Charles Dickens", "Mark Twain", "Jane Austen"],
+            correctOptionIndex: 0
+        },
+        {
+            question: "Which planet is known as the 'Morning Star'?",
+            options: ["Mars", "Venus", "Mercury", "Jupiter"],
+            correctOptionIndex: 1
+        },
+        {
+            question: "What is the largest ocean on Earth?",
+            options: ["Indian Ocean", "Pacific Ocean", "Atlantic Ocean", "Arctic Ocean"],
+            correctOptionIndex: 1
+        },
+        {
+            question: "Who developed the first successful polio vaccine?",
+            options: ["Alexander Fleming", "Jonas Salk", "Marie Curie", "Louis Pasteur"],
+            correctOptionIndex: 1
+        },
+        {
+            question: "Which programming language is known for its snake logo?",
+            options: ["Java", "C++", "Python", "Ruby"],
+            correctOptionIndex: 2
+        },
+        {
+            question: "How many continents are there on Earth?",
+            options: ["5", "6", "7", "8"],
+            correctOptionIndex: 2
+        },
+        {
+            question: "Which gas do plants primarily use for photosynthesis?",
+            options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+            correctOptionIndex: 2
+        },
+        {
+            question: "What is the speed of light in vacuum?",
+            options: ["300,000 km/s", "150,000 km/s", "100,000 km/s", "250,000 km/s"],
+            correctOptionIndex: 0
+        },
+        {
+            question: "What is the hardest natural substance on Earth?",
+            options: ["Gold", "Iron", "Diamond", "Quartz"],
+            correctOptionIndex: 2
+        },
+        {
+            question: "Which country is known for inventing pizza?",
+            options: ["France", "Italy", "USA", "Spain"],
+            correctOptionIndex: 1
+        },
+        {
+            question: "Who painted the Mona Lisa?",
+            options: ["Leonardo da Vinci", "Vincent van Gogh", "Pablo Picasso", "Claude Monet"],
+            correctOptionIndex: 0
+        },
+        {
+            question: "What is the smallest unit of life?",
+            options: ["Atom", "Molecule", "Cell", "Organ"],
+            correctOptionIndex: 2
+        },
     ];
-    await QuizQuestions.insertMany(questions);
+    for(let i in questions){
+        let currQuestion = questions[i];
+        if(!(await QuizQuestions.findOne({question: currQuestion['question']}))){
+            await QuizQuestions.insertOne(currQuestion);
+        }
+    }
 }
 
 module.exports = { connectDB, initializeQuestions };
