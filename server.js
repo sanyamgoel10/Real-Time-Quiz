@@ -11,7 +11,7 @@ const http = require('http');
 const server = http.createServer(app);
 
 // Import Websocket server
-const { initializeWebSocketServer } = require('./wsServer.js');
+const { initializeSocketIO } = require('./wsServer.js');
 
 const startServer = async () => {
     try {
@@ -22,11 +22,11 @@ const startServer = async () => {
         await initializeQuestions();
         
         // Initialize a websocket server
-        // await initializeWebSocketServer(server);
+        await initializeSocketIO(server);
 
         // Start Server
         server.listen(PORT, () => {
-            console.log(`Server & WebSocket running on port ${PORT}`);
+            console.log(`Server running on port ${PORT}`);
         });
     } catch (error) {
         console.error("Failed to start server:", error);
