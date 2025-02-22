@@ -4,11 +4,8 @@ const router = express.Router();
 // Controllers
 const { landingpage, searchGame } = require('../controllers/GameController.js');
 
-// Services
-const { validateUserLogin } = require('../middleware/authMiddleware.js');
-
 // Routes
-router.get('/', validateUserLogin, landingpage);
-router.get('/start', validateUserLogin, searchGame)
+router.get('/', landingpage);
+router.get('/start', searchGame)
 
 module.exports = router;

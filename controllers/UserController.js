@@ -36,7 +36,7 @@ class UserController{
                 username: uName,
                 time: Date()
             });
-            return res.cookie('userToken', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 15 * 60 * 1000 }).redirect(`/game`);
+            return res.cookie('token', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 15 * 60 * 1000 }).redirect(`/game`);
         }else{
             let errResp = `Invalid Password`;
             console.log(`Error: ${errResp}`);
@@ -102,7 +102,7 @@ class UserController{
             });
             await newUser.save();
 
-            return res.cookie('userToken', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 15 * 60 * 1000 }).redirect(`/game`);
+            return res.cookie('token', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 15 * 60 * 1000 }).redirect(`/game`);
         }catch(error){
             console.log("Error: ", error);
             return res.render('error');
@@ -110,7 +110,7 @@ class UserController{
     }
 
     async userLogout(req, res){
-        return res.clearCookie('userToken').redirect('/');
+        return res.clearCookie('token').redirect('/');
     }
 }
 

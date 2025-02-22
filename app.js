@@ -15,11 +15,14 @@ app.use(cookieParser());
 const userRoutes = require('./routes/UserRoutes.js');
 const gameRoutes = require('./routes/GameRoutes.js');
 
+// Services
+const { validateUserLogin, checkAlreadyLoggedIn } = require('./middleware/authMiddleware.js');
+
 // User Routes
-app.use('/', userRoutes);
+app.use('/', checkAlreadyLoggedIn, userRoutes);
 
 // Game Routes
-app.use('/game', gameRoutes);
+app.use('/game', validateUserLogin, gameRoutes);
 
 // 404 Error Handler
 app.use((req, res) => {
