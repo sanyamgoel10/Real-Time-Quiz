@@ -33,7 +33,7 @@ class LoginController{
 
         if(await encryptPass.comparePassword(pass, findExistingUname.password)){
             let userToken = findExistingUname.token;
-            return res.cookie('userToken', userToken, { httpOnly: true, secure: true, sameSite: "strict" }).redirect(`/game`);
+            return res.cookie('userToken', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 15 * 60 * 1000 }).redirect(`/game`);
         }else{
             let errResp = `Invalid Password`;
             console.log(`Error: ${errResp}`);
@@ -95,12 +95,11 @@ class LoginController{
 
             const newUser = new Users({
                 username: uName,
-                password: await encryptPass.hashPassword(pass),
-                token: userToken,
+                password: await encryptPass.hashPassword(pass)
             });
             await newUser.save();
 
-            return res.cookie('userToken', userToken, { httpOnly: true, secure: true, sameSite: "strict" }).redirect(`/game`);
+            return res.cookie('userToken', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 15 * 60 * 1000 }).redirect(`/game`);
         }catch(error){
             console.log("Error: ", error);
             return res.render('error');

@@ -8,7 +8,7 @@ class TokenService {
                 return false;   
             }
             let jwtSecretKey = config.JWT_SECRET_KEY;
-            const token = jwt.sign(data, jwtSecretKey);
+            const token = jwt.sign(data, jwtSecretKey, { expiresIn: '1m' });
             return token;
         }catch(error){
             console.log(`Error: ${error}`);
