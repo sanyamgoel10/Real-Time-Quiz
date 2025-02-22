@@ -2,13 +2,13 @@ const express = require("express");
 const router = express.Router();
 
 // Controllers
-const { landingpage, searchGame } = require('../controllers/gameController.js');
+const { landingpage, searchGame } = require('../controllers/GameController.js');
 
-// Middleware
-const { verifyJwt } = require('../middleware/validateUserReq.js');
+// Services
+const { validateUserLogin } = require('../middleware/authMiddleware.js');
 
 // Routes
-router.get('/', verifyJwt, landingpage);
-router.get('/start', verifyJwt, searchGame)
+router.get('/', validateUserLogin, landingpage);
+router.get('/start', validateUserLogin, searchGame)
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const { connectDB, initializeQuestions } = require("./services/db.js");
+const { connectDB, initializeQuestions } = require("./services/DatabaseService.js");
 
 const config = require("./config/config.js");
 

@@ -12,8 +12,8 @@ app.set('view engine','ejs');
 app.use(cookieParser());
 
 // Routes
-const userRoutes = require('./routes/userRoutes.js');
-const gameRoutes = require('./routes/gameRoutes.js');
+const userRoutes = require('./routes/UserRoutes.js');
+const gameRoutes = require('./routes/GameRoutes.js');
 
 // User Routes
 app.use('/', userRoutes);

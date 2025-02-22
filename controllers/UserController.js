@@ -1,8 +1,8 @@
 const Users = require('../services/models/users.js');
-const encryptPass = require('../services/encDecPass.js');
-const encDecToken = require('../services/encDecJwtToken.js');
+const encryptPass = require('../services/PasswordService.js');
+const encDecToken = require('../services/TokenService.js');
 
-class LoginController{
+class UserController{
     async homepage(req, res){
         return res.redirect('/login');
     }
@@ -32,7 +32,7 @@ class LoginController{
         }
 
         if(await encryptPass.comparePassword(pass, findExistingUname.password)){
-            let userToken = await encDecToken.createNewToken({
+            let userToken = await encDecToken.createJwtToken({
                 username: uName,
                 time: Date()
             });
@@ -86,7 +86,7 @@ class LoginController{
                 return res.render('register', {msg: `${errResp}`});
             }
 
-            let userToken = await encDecToken.createNewToken({
+            let userToken = await encDecToken.createJwtToken({
                 username: uName,
                 time: Date()
             });
@@ -114,4 +114,4 @@ class LoginController{
     }
 }
 
-module.exports = new LoginController();
+module.exports = new UserController();

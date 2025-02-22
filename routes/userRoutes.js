@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Controllers
-const { homepage, loginPage, userLogin, registerPage, registerNewUser, userLogout } = require('../controllers/loginController.js');
+const { homepage, loginPage, userLogin, registerPage, registerNewUser, userLogout } = require('../controllers/UserController.js');
 
 // Routes
 router.get('/', homepage);

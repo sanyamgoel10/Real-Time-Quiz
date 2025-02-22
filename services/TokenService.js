@@ -2,7 +2,7 @@ const config = require("../config/config.js");
 const jwt = require('jsonwebtoken');
 
 class TokenService {
-    async createNewToken(data) {
+    async createJwtToken(data) {
         try{
             if('undefined' == typeof config.JWT_SECRET_KEY){
                 return false;   
@@ -26,7 +26,7 @@ class TokenService {
             return false;
         }catch(error){
             console.log(`Error: ${error}`);
-            return false
+            return false;
         }
     }
 }

@@ -1,7 +1,7 @@
-const { verifyJwtToken } = require('../services/encDecJwtToken.js');
+const { verifyJwtToken } = require('../services/TokenService.js');
 
-class ValidateToken{
-    async verifyJwt(req, res, next){
+class AuthMiddleware{
+    async validateUserLogin(req, res, next){
         try {
             let pageCookies = req.cookies;
 
@@ -26,4 +26,4 @@ class ValidateToken{
     }
 }
 
-module.exports = new ValidateToken();
+module.exports = new AuthMiddleware();
