@@ -1,4 +1,4 @@
-const { connectDB, initializeQuestions } = require("./services/DatabaseService.js");
+const { connectDB } = require("./services/DatabaseService.js");
 
 const config = require("./config/config.js");
 
@@ -17,10 +17,7 @@ const startServer = async () => {
     try {
         // Connect to database
         await connectDB();
-
-        // Initialize questions in database
-        await initializeQuestions();
-        
+    
         // Initialize a websocket server
         await initializeSocketIO(server);
 

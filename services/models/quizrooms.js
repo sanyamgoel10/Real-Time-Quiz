@@ -2,24 +2,45 @@ const mongoose = require("mongoose");
 const { MaxQuizQuestions } = require('../../config/config.js');
 
 const quizRoomsSchema = new mongoose.Schema({
-    players: [
-        {
-            username: { 
-                type: String, 
-                required: true 
-            },
-            score: { 
-                type: Number, 
-                default: 0,
-                min: 0,
-                max: MaxQuizQuestions
-            },
+    player1: {
+        username: {
+            type: String,
+            requried: true,
+            default: null
         },
-    ],
-    winner: { 
-        type: String, 
-        ref: 'User',
-        default: null,
+        score: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: MaxQuizQuestions
+        },
+        isWinner: {
+            type: Boolean,
+            default: 0,
+            required: true
+        }
+    },
+    player2: {
+        username: {
+            type: String,
+            requried: true,
+            default: null
+        },
+        score: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: MaxQuizQuestions
+        },
+        isWinner: {
+            type: Boolean,
+            default: 0,
+            required: true
+        }
+    },
+    questions: {
+        type: Array,
+        required: true
     },
     status: {
         type: String,
@@ -27,26 +48,16 @@ const quizRoomsSchema = new mongoose.Schema({
         required: true,
         default: 'awaiting',
     },
-    questions: [
-        {
-            type: [mongoose.Schema.Types.ObjectId],
-            ref: 'QuizQuestion',
-        },
-    ],
-    currentQuestion: { 
-        type: Number, 
-        default: 0 
-    },
     createdAt: { 
         type: Date, 
-        default: Date.now 
+        default: Date.now()
     },
     startedAt: { 
         type: Date 
     },
     completedAt: { 
         type: Date 
-    },
+    }    
 });
 
 const QuizRooms = mongoose.model("QuizRoom", quizRoomsSchema);
