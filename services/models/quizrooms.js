@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 const { MaxQuizQuestions } = require('../../config/config.js');
 
 const quizRoomsSchema = new mongoose.Schema({
+    id: {
+        type: String,
+        required: true,
+        unique: true
+    },
     player1: {
         username: {
             type: String,
