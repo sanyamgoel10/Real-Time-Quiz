@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    ingame: {
+        type: Boolean,
+        default: 0,
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
