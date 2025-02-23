@@ -112,6 +112,22 @@ class DatabaseService{
         return roomId;
     }
 
+    async getQuizRoomUserCount(roomId){
+        let quizDetails = await QuizRooms.findOne({ id: roomId });
+        if(!quizDetails){
+            // Room Not Found
+            return false;
+        }
+        let userCnt = 0;
+        if(quizDetails['player1']['username']){
+            userCnt++;
+        }
+        if(quizDetails['player2']['username']){
+            userCnt++;
+        }
+        return userCnt;
+    }
+
     async joinUserRoom(username, roomId){
         if(await this.getUserQuizStatus(username)){
             // User already in game
@@ -195,9 +211,18 @@ class DatabaseService{
         }
 
         await this.updateQuizRoomStatus(roomId, 'completed');
+        await this.updateUserInGameStatus(quizDetails['player1']['username'], false);
+        await this.updateUserInGameStatus(quizDetails['player2']['username'], false);
     }
 
     async expireQuizRoom(roomId){
+        let roomDetails = await QuizRooms.findOne({ id: roomId });
+        if(roomDetails['player1']['username']){
+            await this.updateUserInGameStatus(roomDetails['player1']['username'], false);
+        }
+        if(roomDetails['player1']['username']){
+            await this.updateUserInGameStatus(roomDetails['player1']['username'], false);
+        }
         await this.updateQuizRoomStatus(roomId, 'expired');
     }
 
