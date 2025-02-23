@@ -18,11 +18,6 @@ const quizRoomsSchema = new mongoose.Schema({
             default: 0,
             min: 0,
             max: MaxQuizQuestions
-        },
-        isWinner: {
-            type: Boolean,
-            default: 0,
-            required: true
         }
     },
     player2: {
@@ -36,12 +31,12 @@ const quizRoomsSchema = new mongoose.Schema({
             default: 0,
             min: 0,
             max: MaxQuizQuestions
-        },
-        isWinner: {
-            type: Boolean,
-            default: 0,
-            required: true
         }
+    },
+    winner: {
+        type: Number,
+        default: 0,
+        required: true
     },
     questions: {
         type: Array,

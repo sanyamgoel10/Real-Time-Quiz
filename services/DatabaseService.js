@@ -65,17 +65,6 @@ class DatabaseService{
         return result;
     }
 
-    async createEmptyQuizRoom(){
-        let currDate = new Date();
-        let roomId = (String(currDate.getFullYear()) + String(Number(currDate.getMonth()) + 1) + String(currDate.getDate()) + String(currDate.getTime()) + String((Math.random() + 1).toString(36).substring(7)));
-        let newRoom = await QuizRooms({
-            id: roomId,
-            questions: await this.getRandomQuizQuestions()
-        });
-        await newRoom.save();
-        return roomId;
-    }
-
     async findRoomByStatus(status = "awaiting"){
         return await QuizRooms.findOne({status });
     }
@@ -84,7 +73,7 @@ class DatabaseService{
         return (await Users.findone({ username }))['ingame'];
     }
 
-    async updateUserQuizStatus(username, ingame){
+    async updateUserInGameStatus(username, ingame){
         await Users.updateOne({ username }, {
             $set: { ingame }
         });
@@ -110,6 +99,17 @@ class DatabaseService{
                 $set: { status }
             });
         }
+    }
+
+    async createQuizRoom(){
+        let currDate = new Date();
+        let roomId = (String(currDate.getFullYear()) + String(Number(currDate.getMonth()) + 1) + String(currDate.getDate()) + String(currDate.getTime()) + String((Math.random() + 1).toString(36).substring(7)));
+        let newRoom = await QuizRooms({
+            id: roomId,
+            questions: await this.getRandomQuizQuestions()
+        });
+        await newRoom.save();
+        return roomId;
     }
 
     async joinUserRoom(username, roomId){
@@ -161,9 +161,59 @@ class DatabaseService{
             });
         }
 
-        await this.updateUserQuizStatus(username, true);
+        await this.updateUserInGameStatus(username, true);
 
         return true;
+    }
+
+    async completeQuizRoomAndMarkWinner(roomId){
+        let quizDetails = await QuizRooms.findOne({ id: roomId });
+        if(!quizDetails){
+            // Room Not Found
+            return false;
+        }
+
+        let p1Score = quizDetails['player1']['score'];
+        let p2Score = quizDetails['player2']['score'];
+
+        let winnerId = 0;
+
+        if(p1Score > p2Score){
+            // P1 Wins
+            winnerId = 1;
+        }else if(p1Score < p2Score){
+            // P2 Wins
+            winnerId = 2;
+        }
+
+        if(winnerId > 0){
+            await QuizRooms.updateOne({ id: roomId }, {
+                $set: {
+                    winner: winnerId
+                }
+            });
+        }
+
+        await this.updateQuizRoomStatus(roomId, 'completed');
+    }
+
+    async expireQuizRoom(roomId){
+        await this.updateQuizRoomStatus(roomId, 'expired');
+    }
+
+    async findCompletedQuizWinner(roomId){
+        let quizDetails = await QuizRooms.findOne({ id: roomId });
+        if(!quizDetails){
+            // Room Not Found
+            return false;
+        }
+        if(quizDetails['winner'] == 1){
+            return quizDetails['player1']['username'];
+        }else if(quizDetails['winner'] == 2){
+            return quizDetails['player2']['username'];
+        }else{
+            return false;
+        }
     }
 }
 
