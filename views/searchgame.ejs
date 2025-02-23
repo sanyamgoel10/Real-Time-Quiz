@@ -9,6 +9,11 @@
         <p id="ShowMessage">
             Please wait, while we are searching for a quiz game for you.....
         </p>
+        <!-- <div id="questionContainer" style="display: none;">
+            <p id="questionText"></p>
+            <div id="options"></div>
+            <button onclick="submitAnswer()">Submit Answer</button>
+        </div> -->
         <p>
             <button onclick="window.location.href='/logout'">Logout</button>
         </p>
@@ -18,38 +23,54 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    // Connect to the Socket.IO server
     const socket = io(`http://${window.location.host}`);
 
-    // Handle connection event
     socket.on('connect', () => {
         console.log(`Connected to server with socket ID: ${socket.id}`);
 
-        // Emit 'SearchRoom' event to the server with the username
-        socket.emit('SearchRoom', {
-            username: "<%=userName%>", // Pass the username from the server-side template
+        // Emit 'StartGame' event to the server with the username
+        socket.emit('StartGame', {
+            username: "<%=userName%>",
         });
     });
 
-    // Handle 'JoinRoom' event from the server
-    socket.on('JoinRoom', (data) => {
-        // Display the room ID and update the UI
-        $('#ShowMessage').html(`You have been matched into a game with Room ID: ${data.roomId}`);
+    // // Handle 'JoinRoom' event from the server
+    // socket.on('JoinRoom', (data) => {
+    //     // Display the room ID and update the UI
+    //     $('#ShowMessage').html(`You have been matched into a game with Room ID: ${data.roomId}`);
 
-        // Optionally, you can add more UI updates or logic here
-        console.log(`Joined room: ${data.roomId}`);
-    });
+    //     // Optionally, you can add more UI updates or logic here
+    //     console.log(`Joined room: ${data.roomId}`);
+    // });
 
-    // Handle custom events (if needed)
-    socket.on('GameStarted', (data) => {
-        console.log('Game started:', data);
-        $('#ShowMessage').html(`Game started! Question: ${data.question}`);
-    });
+    // // Handle 'NewQuestion' event from the server
+    // socket.on('NewQuestion', (data) => {
+    //     console.log('New Question:', data);
+    //     currentQuestion = data;
 
-    socket.on('GameEnded', (data) => {
-        console.log('Game ended:', data);
-        $('#ShowMessage').html(`Game ended! Winner: ${data.winner}`);
-    });
+    //     // Update the UI to show the new question
+    //     $('#questionText').text(`Question ${data.questionNumber}: ${data.question.questionText}`);
+    //     $('#options').empty();
+    //     data.question.options.forEach((option, index) => {
+    //         $('#options').append(`<button onclick="selectAnswer(${index})">${option}</button>`);
+    //     });
+
+    //     // Show the question container
+    //     $('#questionContainer').show();
+    // });
+
+    // // Handle 'GameStarted' event from the server
+    // socket.on('GameStarted', (data) => {
+    //     console.log('Game started:', data);
+    //     $('#ShowMessage').html(`Game started! Question: ${data.question}`);
+    // });
+
+    // // Handle 'GameEnded' event from the server
+    // socket.on('GameEnded', (data) => {
+    //     console.log('Game ended:', data);
+    //     $('#ShowMessage').html(`Game ended! Winner: ${data.winner}`);
+    //     $('#questionContainer').hide(); // Hide the question container
+    // });
 
     // Handle disconnection event
     socket.on('disconnect', () => {
