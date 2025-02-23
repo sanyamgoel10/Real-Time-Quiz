@@ -2,9 +2,11 @@ const config = require("../config/config.js");
 const mongoose = require("mongoose");
 
 const Users = require('./models/users.js');
-const QuizQuestions = require('./models/quiz_db.js');
+const QuizQuestions = require('./models/quizquestions.js');
+const QuizRooms = require('./models/quizrooms.js');
 
 class DatabaseService{
+    // Connect to Database on server start
     async connectDB(){
         try {
             await mongoose.connect(`mongodb://${config.dbHost}:${config.dbPort}/${config.dbName}`);
@@ -15,6 +17,7 @@ class DatabaseService{
         }
     }
 
+    // Quiz Database Related
     async initializeQuestions(){
         const questions = [
             {
@@ -120,13 +123,20 @@ class DatabaseService{
         ];
         for(let i in questions){
             let currQuestion = questions[i];
-            currQuestion['id'] = Number(i) + 1;
+            currQuestion['qid'] = Number(i) + 1;
             if(!(await QuizQuestions.findOne({question: currQuestion['question']}))){
                 await QuizQuestions.insertOne(currQuestion);
             }
         }
     }
 
+    async getRandomQuizQuestions(){
+        return await QuizQuestions.aggregate([
+            { $sample: { size: config.MaxQuizQuestions } },
+        ]);
+    }
+
+    // User Register/Login
     async validateUserName(username){
         let findExistingUname = await Users.findOne({
             username: username
@@ -146,6 +156,126 @@ class DatabaseService{
     async registerNewUser(userDetails){
         let newUser = new Users(userDetails);
         await newUser.save();
+    }
+
+    // Quiz Related
+    async changeUserStatus(userName, status, roomId=null){
+        await Users.updateOne({
+            username: userName
+        }, {
+            $set: {
+                quizStatus: status,
+                roomId: roomId
+            }
+        });
+    }
+
+    async checkUserStatus(userName){
+        let userData = await Users.findOne({
+            username: userName
+        });
+        return {
+            status: userData.quizStatus,
+            roomId: userData.roomId
+        };
+    }
+
+    async getAwaitingGameRoom(){
+        return await QuizRooms.findOne({
+            status: 'awaiting'
+        });
+    }
+
+    async createNewQuizRoom(){
+        let newRoom = new QuizRooms({
+            questions: await this.getRandomQuizQuestions(),
+        });
+        await newRoom.save();
+        return newRoom;
+    }
+
+    async joinQuizRoom(roomId, userName) {
+        try {
+            const roomDetails = await QuizRooms.findById(roomId);
+            if (!roomDetails) {
+                throw new Error('Quiz room not found');
+            }
+    
+            if (roomDetails.players.length >= 2) {
+                throw new Error('Quiz room is already full');
+            }
+
+            await QuizRooms.updateOne(
+                { _id: roomId },
+                {
+                    $push: {
+                        players: {
+                            username: userName,
+                            score: 0,
+                        },
+                    },
+                }
+            );
+    
+            if (roomDetails.players.length === 1) {
+                await QuizRooms.updateOne(
+                    { _id: roomId },
+                    {
+                        $set: {
+                            status: 'inprogress',
+                            startedAt: Date.now(),
+                        },
+                    }
+                );
+            }
+
+            await this.changeUserStatus(userName, 'ingame', roomId);
+
+            console.log(`User ${userName} joined quiz room ${roomId}`);
+            return true;
+        } catch (error) {
+            console.error('Error joining quiz room:', error.message);
+            return false;
+        }
+    }    
+
+    async completeActiveQuizRoom(roomId){
+        try{
+            const quizRoom = await QuizRooms.findById(roomId);
+            if (!quizRoom) {
+                throw new Error('Quiz room not found');
+            }
+            if (quizRoom.players.length == 2) {
+                const winner = quizRoom.players.reduce((prev, curr) => 
+                    (curr.score === prev.score) ? null : (curr.score > prev.score ? curr : prev)
+                );
+                await QuizRooms.updateOne(
+                    { _id: roomId },
+                    {
+                        $set: {
+                            winner: winner ? winner.username : null,
+                            status: 'completed',
+                            completedAt: Date.now(),
+                        },
+                    }
+                );
+                console.log(`Quiz room ${roomId} completed. Winner: ${winner ? winner.username : 'None (tie)'}`);
+            } else {
+                await QuizRooms.updateOne(
+                    { _id: roomId },
+                    {
+                        $set: {
+                            status: 'expired',
+                            completedAt: Date.now(),
+                        },
+                    }
+                );
+                console.log(`Quiz room ${roomId} expired due to insufficient players.`);
+            }
+        }catch(error){
+            console.error('Error joining quiz room:', error.message);
+            return false;
+        }
     }
 }
 

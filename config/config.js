@@ -9,4 +9,6 @@ module.exports = {
 
     JWT_SECRET_KEY: "jwt_secret_key_sg",
     TOKEN_HEADER_KEY: "jwt_header_key_sg",
+
+    MaxQuizQuestions: 4,
 }

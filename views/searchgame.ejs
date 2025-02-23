@@ -6,7 +6,7 @@
     </head>
     <body>
         <h1>Real-Time Quiz</h1>
-        <p id="searching">
+        <p id="ShowMessage">
             Please wait, while we are searching for a quiz game for you.....
         </p>
         <p>
@@ -15,5 +15,51 @@
     </body>
 </html>
 
-<script type="text/javascript">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    // Connect to the Socket.IO server
+    const socket = io(`http://${window.location.host}`);
+
+    // Handle connection event
+    socket.on('connect', () => {
+        console.log(`Connected to server with socket ID: ${socket.id}`);
+
+        // Emit 'SearchRoom' event to the server with the username
+        socket.emit('SearchRoom', {
+            username: "<%=userName%>", // Pass the username from the server-side template
+        });
+    });
+
+    // Handle 'JoinRoom' event from the server
+    socket.on('JoinRoom', (data) => {
+        // Display the room ID and update the UI
+        $('#ShowMessage').html(`You have been matched into a game with Room ID: ${data.roomId}`);
+
+        // Optionally, you can add more UI updates or logic here
+        console.log(`Joined room: ${data.roomId}`);
+    });
+
+    // Handle custom events (if needed)
+    socket.on('GameStarted', (data) => {
+        console.log('Game started:', data);
+        $('#ShowMessage').html(`Game started! Question: ${data.question}`);
+    });
+
+    socket.on('GameEnded', (data) => {
+        console.log('Game ended:', data);
+        $('#ShowMessage').html(`Game ended! Winner: ${data.winner}`);
+    });
+
+    // Handle disconnection event
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        $('#ShowMessage').html('Disconnected from the server. Please refresh the page.');
+    });
+
+    // Handle errors
+    socket.on('error', (error) => {
+        console.error('Socket error:', error);
+        $('#ShowMessage').html(`Error: ${error.message}`);
+    });
 </script>

@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const questionsSchema = new mongoose.Schema({
-    id: {
+    qid: {
         type: Number,
         required: true,
-        unique: true
+        unique: true,
     },
     question: {
         type: String,

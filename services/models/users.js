@@ -11,6 +11,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    quizStatus: {
+        type: String,
+        enum: ['idle', 'ingame'],
+        default: 'idle',
+        required: true,
+    },
+    roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'QuizRooms',
+        default: null,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
