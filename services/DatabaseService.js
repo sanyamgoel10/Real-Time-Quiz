@@ -66,11 +66,11 @@ class DatabaseService{
     }
 
     async findRoomByStatus(status = "awaiting"){
-        return await QuizRooms.findOne({status });
+        return await QuizRooms.findOne({ status });
     }
 
     async getUserQuizStatus(username){
-        return (await Users.findone({ username }))['ingame'];
+        return (await Users.findOne({ username }))['ingame'];
     }
 
     async updateUserInGameStatus(username, ingame){

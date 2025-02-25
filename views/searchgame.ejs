@@ -34,6 +34,10 @@
         });
     });
 
+    socket.on('NewQuestion', (data) => {
+        console.log("Question from Server: ", data);
+    })
+
     // // Handle 'JoinRoom' event from the server
     // socket.on('JoinRoom', (data) => {
     //     // Display the room ID and update the UI
