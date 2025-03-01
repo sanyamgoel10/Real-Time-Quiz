@@ -74,7 +74,7 @@
     $('.option').on('click', function(event) {
         let selectedOption = Number(event.target.id);
         socket.emit('SubmitAnswer', {
-            QuestionId: $('#QuestionId').val(qid),
+            QuestionId: $('#QuestionId').val(),
             SelectedOption: selectedOption - 1,
         });
         clearQuizQuestions();
