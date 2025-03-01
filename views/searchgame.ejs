@@ -7,13 +7,36 @@
     <body>
         <h1>Real-Time Quiz</h1>
         <p id="ShowMessage">
-            Please wait, while we are searching for a quiz game for you.....
+            Searching for an active quiz game...
         </p>
-        <!-- <div id="questionContainer" style="display: none;">
-            <p id="questionText"></p>
-            <div id="options"></div>
-            <button onclick="submitAnswer()">Submit Answer</button>
-        </div> -->
+
+        <input type="text" id="QuestionId" value="" hidden>
+        <table id="QuizQuestions" hidden>
+            <thead>
+                <tr>
+                    <td colspan="4">
+                        <strong id="Question"></strong>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <button class="option" id="1"></button>
+                    </td>
+                    <td>
+                        <button class="option" id="2"></button>
+                    </td>
+                    <td>
+                        <button class="option" id="3"></button>
+                    </td>
+                    <td>
+                        <button class="option" id="4"></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>        
+
         <p>
             <button onclick="window.location.href='/logout'">Logout</button>
         </p>
@@ -25,66 +48,80 @@
 <script>
     const socket = io(`http://${window.location.host}`);
 
+    // Connected to server
     socket.on('connect', () => {
         console.log(`Connected to server with socket ID: ${socket.id}`);
-
-        // Emit 'StartGame' event to the server with the username
         socket.emit('StartGame', {
             username: "<%=userName%>",
         });
     });
 
+    // Game Started
+    socket.on('StartGame', (data) => {
+        let opponent = data['Oppenent'];
+        $('#ShowMessage').html(`You have been matched with ${opponent}.`).show();
+    });
+
+    // New Question
     socket.on('NewQuestion', (data) => {
-        console.log("Question from Server: ", data);
-    })
+        let qid = data['QuestionId'];
+        let question = data['Question'];
+        let options = data['options'];
+        showQuizQuestions(qid, question, options);
+    });
 
-    // // Handle 'JoinRoom' event from the server
-    // socket.on('JoinRoom', (data) => {
-    //     // Display the room ID and update the UI
-    //     $('#ShowMessage').html(`You have been matched into a game with Room ID: ${data.roomId}`);
+    // Answer submitted
+    $('.option').on('click', function(event) {
+        let selectedOption = Number(event.target.id);
+        socket.emit('SubmitAnswer', {
+            QuestionId: $('#QuestionId').val(qid),
+            SelectedOption: selectedOption - 1,
+        });
+        clearQuizQuestions();
+    });
 
-    //     // Optionally, you can add more UI updates or logic here
-    //     console.log(`Joined room: ${data.roomId}`);
-    // });
+    // Quiz Ended, winner declared
+    socket.on('QuizEnd', (data) => {
+        let winner = data['Winner'];
+        clearQuizQuestions();
+        if(winner == '<%=userName%>'){
+            $('#ShowMessage').html(`You won the quiz. You will be redirected to homepage in 10 seconds.`).show();
+        }else{
+            $('#ShowMessage').html(`Winner is <u>${winner}</u>. You will be redirected to homepage in 10 seconds.`).show();
+        }
 
-    // // Handle 'NewQuestion' event from the server
-    // socket.on('NewQuestion', (data) => {
-    //     console.log('New Question:', data);
-    //     currentQuestion = data;
-
-    //     // Update the UI to show the new question
-    //     $('#questionText').text(`Question ${data.questionNumber}: ${data.question.questionText}`);
-    //     $('#options').empty();
-    //     data.question.options.forEach((option, index) => {
-    //         $('#options').append(`<button onclick="selectAnswer(${index})">${option}</button>`);
-    //     });
-
-    //     // Show the question container
-    //     $('#questionContainer').show();
-    // });
-
-    // // Handle 'GameStarted' event from the server
-    // socket.on('GameStarted', (data) => {
-    //     console.log('Game started:', data);
-    //     $('#ShowMessage').html(`Game started! Question: ${data.question}`);
-    // });
-
-    // // Handle 'GameEnded' event from the server
-    // socket.on('GameEnded', (data) => {
-    //     console.log('Game ended:', data);
-    //     $('#ShowMessage').html(`Game ended! Winner: ${data.winner}`);
-    //     $('#questionContainer').hide(); // Hide the question container
-    // });
+        setTimeout(() => {
+            window.location.href = '/game'
+        }, 10000);
+    });
 
     // Handle disconnection event
     socket.on('disconnect', () => {
         console.log('Disconnected from server');
-        $('#ShowMessage').html('Disconnected from the server. Please refresh the page.');
+        $('#ShowMessage').html('Disconnected from the server. Please refresh the page.').show();
     });
 
     // Handle errors
     socket.on('error', (error) => {
         console.error('Socket error:', error);
-        $('#ShowMessage').html(`Error: ${error.message}`);
+        $('#ShowMessage').html(`Error: ${error.message}`).show();
     });
+
+    function showQuizQuestions(qid, question, options){
+        $('#ShowMessage').html('').hide();
+        $('#QuestionId').val(qid);
+        $('#QuizQuestions #Question').html(question);
+        $('#QuizQuestions .option#1').html(options[0]);
+        $('#QuizQuestions .option#2').html(options[1]);
+        $('#QuizQuestions .option#3').html(options[2]);
+        $('#QuizQuestions .option#4').html(options[3]);
+        $('#QuizQuestions').show();
+    }
+
+    function clearQuizQuestions(){
+        $('#QuizQuestions').hide();
+        $('#QuizQuestions #Question, #QuizQuestions .option#1, #QuizQuestions .option#2, #QuizQuestions .option#3, #QuizQuestions .option#4').html(``);
+        $('#QuestionId').val('');
+        $('#ShowMessage').html('New question on the way...').show();
+    }
 </script>
