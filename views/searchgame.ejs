@@ -51,7 +51,7 @@
     // Connected to server
     socket.on('connect', () => {
         console.log(`Connected to server with socket ID: ${socket.id}`);
-        socket.emit('StartGame', {
+        socket.emit('SearchGame', {
             username: "<%=userName%>",
         });
     });
