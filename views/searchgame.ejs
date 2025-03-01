@@ -66,7 +66,7 @@
     socket.on('NewQuestion', (data) => {
         let qid = data['QuestionId'];
         let question = data['Question'];
-        let options = data['options'];
+        let options = data['Options'];
         showQuizQuestions(qid, question, options);
     });
 
