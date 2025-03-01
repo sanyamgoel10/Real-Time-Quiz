@@ -58,7 +58,7 @@
 
     // Game Started
     socket.on('StartGame', (data) => {
-        let opponent = data['Oppenent'];
+        let opponent = data['Opponent'];
         $('#ShowMessage').html(`You have been matched with ${opponent}.`).show();
     });
 
