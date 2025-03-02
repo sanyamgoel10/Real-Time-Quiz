@@ -8,7 +8,11 @@ class DatabaseService{
     // Connect to Database on server start
     async connectDB(){
         try {
-            await mongoose.connect(`mongodb://${config.dbHost}:${config.dbPort}/${config.dbName}`);
+            if(config.environment == 'live'){
+                await mongoose.connect(config.dbUri);
+            }else{
+                await mongoose.connect(`mongodb://${config.dbHost}:${config.dbPort}/${config.dbName}`);
+            }
             console.log('Database is connected');
         } catch (err) {
             console.error('Error connecting to the database:', err);

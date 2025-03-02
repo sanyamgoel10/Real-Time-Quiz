@@ -1,15 +1,19 @@
 require('dotenv').config();
 module.exports = {
-    port: process.env.port,
+    environment: process.env.environment,
+
+    port: Number(process.env.port),
     
+    dbUri: process.env.MongoDBUri,
+
     dbHost: process.env.dbHost,
-    dbPort: process.env.dbPort,
+    dbPort: Number(process.env.dbPort),
     dbName: process.env.dbName,
 
-    EncryptSaltRounds: process.env.EncryptSaltRounds,
+    EncryptSaltRounds: Number(process.env.EncryptSaltRounds),
 
     JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
     TOKEN_HEADER_KEY: process.env.TOKEN_HEADER_KEY,
 
-    MaxQuizQuestions: process.env.MaxQuizQuestions,
+    MaxQuizQuestions: Number(process.env.MaxQuizQuestions),
 }
