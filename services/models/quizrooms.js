@@ -34,8 +34,8 @@ const quizRoomsSchema = new mongoose.Schema({
         }
     },
     winner: {
-        type: Number,
-        default: 0,
+        type: String,
+        default: null,
         required: true
     },
     questions: {

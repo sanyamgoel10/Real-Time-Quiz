@@ -1,6 +1,9 @@
 const socketIO = require('socket.io');
 const DatabaseService = require('./services/DatabaseService.js');
 
+const Users = require('./services/models/users.js');
+const QuizRooms = require('./services/models/quizrooms.js');
+
 const initializeSocketIO = async (server) => {
     const io = socketIO(server);
     io.on('connection', (socket) => oneConnection(io, socket));
@@ -11,48 +14,138 @@ module.exports = { initializeSocketIO };
 
 async function oneConnection(io, socket) {
     console.log(`New client connected: ${socket.id}`);
-    socket.on('StartGame', async (data) => {
-        try {
-            console.log(`Message from Client: `, data);
 
-            socket.UserName = data.username;
+    let socketUserName;
 
-            let gameStarted = false;
-            let roomId;
-            let awaitQuiz = await DatabaseService.findRoomByStatus();
-            if(awaitQuiz){
-                gameStarted = true;
-                roomId = awaitQuiz['id'];
-                await DatabaseService.joinUserRoom(socket.UserName, roomId);
-            }else{
-                roomId = await DatabaseService.createQuizRoom();
+    socket.on('SearchGame', async ({ username }) => {
+        console.log(`${username} is searching for a game...`);
+
+        socketUserName = username;
+
+        const user = await Users.findOne({ username });
+
+        if (!user) {
+            socket.emit('error', { message: 'User not found!' });
+            return;
+        }
+
+        if(!user.ingame){
+            user.ingame = true;
+            await user.save();
+
+            // Find an available game
+            let game = await QuizRooms.findOne({ status: 'awaiting' });
+
+            if (game) {
+                // Join the existing game
+                game.player2.username = username;
+                game.status = 'inprogress';
+                game.startedAt = new Date();
+                await game.save();
+
+                socket.join(game.id);
+
+                io.to(game.id).emit('StartGame', {
+                    Opponent: {
+                        [game.player1.username]: game.player2.username,
+                        [game.player2.username]: game.player1.username,
+                    }
+                });
+                await sendQuestionsOneByOne(io, game.id, game);
+            } else {
+                // Create a new game
+                const gameId = `game_${Date.now()}`;
+                game = new QuizRooms({
+                    id: gameId,
+                    player1: { username, score: 0 },
+                    player2: { username: null, score: 0 },
+                    questions: await DatabaseService.getRandomQuizQuestions(),
+                    status: 'awaiting',
+                    winner: 0,
+                    createdAt: new Date(),
+                });
+                await game.save();
+
+                socket.join(gameId);
             }
-            await DatabaseService.joinUserRoom(socket.UserName, roomId);
-            socket.join(roomId);
-
-            // Send questions one by one
-            // let p1 = awaitQuiz['player1']['username'] ? awaitQuiz['player1']['username'] : awaitQuiz['player2']['username'];
-            // let p2 = currUserName;
-            // let questionsList = awaitQuiz['questions'];
-            // socket.emit('NewQuestion', {
-            //     Question: questionsList[0]['question'],
-            //     Option1: questionsList[0]['question'][0],
-            //     Option2: questionsList[0]['question'][1],
-            //     Option3: questionsList[0]['question'][2],
-            //     Option4: questionsList[0]['question'][3],
-            // })
-
-            io.sockets.in(roomId).emit('NewQuestion', 'hello for new question');
-        }catch (error) {
-            console.error('Error handling StartGame event:', error.message);
+        }else{
+            socket.emit('InProgress', {});
         }
     });
 
+    // **Handle answer submission**
+    socket.on('SubmitAnswer', async ({ Username, QuestionId, SelectedOption }) => {
+        let roomId = Array.from(socket.rooms)[1];
+        let game = await QuizRooms.findOne({ id: roomId });
+        if(game){
+            let player = (game.player1.username == Username) ? game.player1 : game.player2;
+            let question = game.questions[Number(QuestionId)];
+            if(Number(SelectedOption) == Number(question.correctOptionIndex)){
+                player.score++;
+            }
+            if(game.player1.username == Username){
+                game.player1 = player;
+            }else{
+                game.player2 = player;
+            }
+            await game.save();
+        }
+    });
+
+    // **Handle disconnection**
     socket.on('disconnect', async () => {
         console.log(`Client disconnected: ${socket.id}`);
-
-        console.log("Client Rooms: ", socket.rooms);
-        console.log("On Disconnect UserName: ", socket.UserName);
-        await DatabaseService.updateUserInGameStatus(socket.UserName, false);
+        const user = await Users.findOne({ username: socketUserName });
+        if (user) {
+            user.ingame = false;
+            await user.save();
+        }
     });
+}
+
+async function sendQuestionsOneByOne(io, roomId, game){
+    let quizQuestions = game['questions'];
+    let i = 0;
+    const interval = setInterval(async () => {
+        if (i < quizQuestions.length) {
+            io.to(roomId).emit('NewQuestion', {
+                QuestionId: i,
+                Question: quizQuestions[i].question,
+                Options: quizQuestions[i].options,
+            });
+            i++;
+        } else {
+            await declareGameResult(io, roomId, game);
+            clearInterval(interval);
+        }
+    }, 20000);
+}
+
+async function declareGameResult(io, roomId, game){
+    let winner = await completeQuizAndDeclareResult(roomId);
+    io.to(roomId).emit('QuizEnd', {
+        Winner: winner
+    });
+}
+
+async function completeQuizAndDeclareResult(roomId){
+    let game = await QuizRooms.findOne({ id: roomId });
+
+    let winner;
+    if(game.player1.score == game.player2.score){
+        winner = null;
+    }else if(game.player1.score > game.player2.score){
+        winner = game.player1.username;
+    }else{
+        winner = game.player2.username;
+    }
+
+    if(winner){
+        game.winner = winner;
+    }
+    game.status = 'completed';
+    game.completedAt = Date.now();
+    await game.save();
+
+    return winner;
 }

@@ -13,6 +13,7 @@
         <input type="text" id="QuestionId" value="" hidden>
         <table id="QuizQuestions" hidden>
             <thead>
+                <tr id="timer"></tr>
                 <tr>
                     <td colspan="4">
                         <strong id="Question"></strong>
@@ -58,8 +59,8 @@
 
     // Game Started
     socket.on('StartGame', (data) => {
-        let opponent = data['Opponent'];
-        $('#ShowMessage').html(`You have been matched with ${opponent}.`).show();
+        let opponent = data['Opponent']['<%=userName%>'];
+        $('#ShowMessage').html(`<b>You have been matched with ${opponent}</b><br>Game will start in some time.`).show();
     });
 
     // New Question
@@ -74,6 +75,7 @@
     $('.option').on('click', function(event) {
         let selectedOption = Number(event.target.id);
         socket.emit('SubmitAnswer', {
+            Username: "<%=userName%>",
             QuestionId: $('#QuestionId').val(),
             SelectedOption: selectedOption - 1,
         });
@@ -84,15 +86,24 @@
     socket.on('QuizEnd', (data) => {
         let winner = data['Winner'];
         clearQuizQuestions();
-        if(winner == '<%=userName%>'){
-            $('#ShowMessage').html(`You won the quiz. You will be redirected to homepage in 10 seconds.`).show();
+        if(winner == null){
+            $('#ShowMessage').html(`<b>Game Draw</b><br>You will be redirected to homepage in 10 seconds.`).show();
+        }else if(winner == '<%=userName%>'){
+            $('#ShowMessage').html(`<b>You won the quiz</b><br>You will be redirected to homepage in 10 seconds.`).show();
         }else{
-            $('#ShowMessage').html(`Winner is <u>${winner}</u>. You will be redirected to homepage in 10 seconds.`).show();
+            $('#ShowMessage').html(`<b><u>${winner}</u> won the quiz</b><br>You will be redirected to homepage in 10 seconds.`).show();
         }
 
         setTimeout(() => {
             window.location.href = '/game'
         }, 10000);
+    });
+
+    socket.on('InProgress', () => {
+        $('#ShowMessage').html('You are already in a game<br>You will be redirected to homepage in 5 seconds.').show();
+        setTimeout(() => {
+            window.location.href = '/game'
+        }, 5000);
     });
 
     // Handle disconnection event
@@ -109,6 +120,12 @@
 
     function showQuizQuestions(qid, question, options){
         $('#ShowMessage').html('').hide();
+        let start = 20;
+        $('#QuizQuestions #timer').html(`Timer: ${start}`);
+        setInterval(function() {
+            start--;
+            $('#QuizQuestions #timer').html(`Timer: ${start}`);
+        }, 1000);
         $('#QuestionId').val(qid);
         $('#QuizQuestions #Question').html(question);
         $('#QuizQuestions .option#1').html(options[0]);
@@ -120,8 +137,8 @@
 
     function clearQuizQuestions(){
         $('#QuizQuestions').hide();
-        $('#QuizQuestions #Question, #QuizQuestions .option#1, #QuizQuestions .option#2, #QuizQuestions .option#3, #QuizQuestions .option#4').html(``);
+        $('#QuizQuestions #Question, #QuizQuestions .option#1, #QuizQuestions .option#2, #QuizQuestions .option#3, #QuizQuestions .option#4, #QuizQuestions #timer').html(``);
         $('#QuestionId').val('');
-        $('#ShowMessage').html('New question on the way...').show();
+        $('#ShowMessage').html('<b>New question on the way</b>').show();
     }
 </script>
