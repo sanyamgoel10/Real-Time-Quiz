@@ -1,14 +1,14 @@
 module.exports = {
-    port: 3000,
+    port: process.env.port,
     
-    dbHost: "localhost",
-    dbPort: 27017,
-    dbName: "quiz_db",
+    dbHost: process.env.dbHost,
+    dbPort: process.env.dbPort,
+    dbName: process.env.dbName,
 
-    EncryptSaltRounds: 10,
+    EncryptSaltRounds: process.env.EncryptSaltRounds,
 
-    JWT_SECRET_KEY: "jwt_secret_key_sg",
-    TOKEN_HEADER_KEY: "jwt_header_key_sg",
+    JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
+    TOKEN_HEADER_KEY: process.env.TOKEN_HEADER_KEY,
 
-    MaxQuizQuestions: 4,
+    MaxQuizQuestions: process.env.MaxQuizQuestions,
 }
