@@ -12,24 +12,7 @@ git clone https://github.com/sanyamgoel10/Real-Time-Quiz.git
 ```ssh
 npm install
 ```
-#### 3. Add config/config.js file
-```ssh
-// Sample config file
-module.exports = {
-    port: 3000,                             // Node App Port
-    
-    dbHost: "localhost",                    // MongoDB Host
-    dbPort: 27017,                          // MongoDB Port
-    dbName: "quiz_db",                      // MongoDB DatabaseName
-
-    EncryptSaltRounds: 10,                  // BCRYPT Password Encryption Salt Rounds
-
-    JWT_SECRET_KEY: "jwt_secret_key_sg",    // JWT Secret key
-    TOKEN_HEADER_KEY: "jwt_header_key_sg",  // JWT Header key
-
-    MaxQuizQuestions: 4,                    // Maximum Quiz Questions
-}
-```
+#### 3. Add required environment variables required from config/config.js file in .env file
 #### 4. Run the application:
 ```ssh
 node server
