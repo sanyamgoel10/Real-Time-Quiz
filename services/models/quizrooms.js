@@ -44,7 +44,7 @@ const quizRoomsSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['awaiting', 'inprogress', 'completed', 'expired'],
+        enum: ['awaiting', 'inprogress', 'completed'],
         required: true,
         default: 'awaiting',
     },

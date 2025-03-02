@@ -113,6 +113,12 @@ async function oneConnection(io, socket) {
 async function sendQuestionsOneByOne(io, roomId, game){
     let quizQuestions = game['questions'];
     let i = 0;
+    io.to(roomId).emit('NewQuestion', {
+        QuestionId: i,
+        Question: quizQuestions[i].question,
+        Options: quizQuestions[i].options,
+    });
+    i++;
     const interval = setInterval(async () => {
         if (i < quizQuestions.length) {
             io.to(roomId).emit('NewQuestion', {
