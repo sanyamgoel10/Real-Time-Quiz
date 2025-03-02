@@ -4,6 +4,8 @@ const DatabaseService = require('./services/DatabaseService.js');
 const Users = require('./services/models/users.js');
 const QuizRooms = require('./services/models/quizrooms.js');
 
+const userRoomMapping = {};
+
 const initializeSocketIO = async (server) => {
     const io = socketIO(server);
     io.on('connection', (socket) => oneConnection(io, socket));
@@ -45,6 +47,8 @@ async function oneConnection(io, socket) {
 
                 socket.join(game.id);
 
+                userRoomMapping[socket.id] = game.id;
+
                 io.to(game.id).emit('StartGame', {
                     Opponent: {
                         [game.player1.username]: game.player2.username,
@@ -67,6 +71,8 @@ async function oneConnection(io, socket) {
                 await game.save();
 
                 socket.join(gameId);
+
+                userRoomMapping[socket.id] = gameId;
             }
         }else{
             socket.emit('InProgress', {});
@@ -75,7 +81,7 @@ async function oneConnection(io, socket) {
 
     // **Handle answer submission**
     socket.on('SubmitAnswer', async ({ Username, QuestionId, SelectedOption }) => {
-        let roomId = Array.from(socket.rooms)[1];
+        let roomId = userRoomMapping[socket.id];
         let game = await QuizRooms.findOne({ id: roomId });
         if(game){
             let player = (game.player1.username == Username) ? game.player1 : game.player2;
@@ -95,6 +101,7 @@ async function oneConnection(io, socket) {
     // **Handle disconnection**
     socket.on('disconnect', async () => {
         console.log(`Client disconnected: ${socket.id}`);
+        await declareGameResult(io, userRoomMapping[socket.id]);
         const user = await Users.findOne({ username: socketUserName });
         if (user) {
             user.ingame = false;
@@ -115,13 +122,13 @@ async function sendQuestionsOneByOne(io, roomId, game){
             });
             i++;
         } else {
-            await declareGameResult(io, roomId, game);
+            await declareGameResult(io, roomId);
             clearInterval(interval);
         }
     }, 20000);
 }
 
-async function declareGameResult(io, roomId, game){
+async function declareGameResult(io, roomId){
     let winner = await completeQuizAndDeclareResult(roomId);
     io.to(roomId).emit('QuizEnd', {
         Winner: winner
