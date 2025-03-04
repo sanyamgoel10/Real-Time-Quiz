@@ -19,7 +19,7 @@ const startServer = async () => {
         await connectDB();
     
         // Initialize a websocket server
-        // await initializeSocketIO(server);
+        await initializeSocketIO(server);
 
         // Start Server
         server.listen(PORT, () => {
