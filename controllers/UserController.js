@@ -34,7 +34,7 @@ class UserController{
                 username: uName,
                 time: Date()
             });
-            return res.cookie('token', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 60 * 60 * 1000 }).redirect(`/game`);
+            return res.cookie('token', userToken, { maxAge: 60 * 60 * 1000 }).redirect(`/game`);
         }else{
             let errResp = `Invalid Password`;
             console.log(`Error: ${errResp}`);
@@ -97,7 +97,7 @@ class UserController{
                 password: await PasswordService.hashPassword(pass)
             });
 
-            return res.cookie('token', userToken, { httpOnly: true, secure: true, sameSite: "strict", maxAge: 60 * 60 * 1000 }).redirect(`/game`);
+            return res.cookie('token', userToken, { maxAge: 60 * 60 * 1000 }).redirect(`/game`);
         }catch(error){
             console.log("Error: ", error);
             return res.render('error');
